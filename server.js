@@ -63,9 +63,9 @@ board =
 	["", "", "", "", "", "", "", ""],
 	["", "", "", "", "", "", "", ""],
 	["", "", "", "", "", "", "", ""],
-	["BPa", "", "BPa", "", "", "", "", ""],
-	["", "WPa", "", "", "", "", "", ""],
 	["", "", "", "", "", "", "", ""],
+	["", "", "", "", "", "", "", ""],
+	["WPa", "WPa", "WPa", "", "", "", "", ""],
 ]
 whosTurn = "W"
 
@@ -155,7 +155,7 @@ function checkForCheck(board, king) {
 
 function checkInLine(board, startX, startY, direction, spaces, isPawn = false, diagonal = false, debug=false) {
     let newX = startX;
-    newY = startY;
+    let newY = startY;
 
     myColour = board[startY][startX][0];
     myType = board[startY][startX][1] + board[startY][startX][2];
@@ -166,88 +166,48 @@ function checkInLine(board, startX, startY, direction, spaces, isPawn = false, d
         console.log("       spaces:", spaces);
     }
 
-    moves = [];
-    
-    while(spaces > 0) {
+    let moves = [];
+
+    while (spaces > 0) {
         console.log("=======START MOVE=========")
         newX += direction.x
         newY += direction.y
-        
+
         try {
-            var value = handleMove(board, {x:startX,y:startY}, {x:newX,y:newY}, diagonal=diagonal);
+            var value = handleMove(board, {x: startX, y: startY}, {x: newX, y: newY}, diagonal = diagonal);
             // TODO: Check if the move allows a check
 
-            if(debug) console.log("Added new move with a value of:", value);
-            newBoard = board;
+            if (debug) console.log("Added new move with a value of:", value);
+            let newBoard = board;
+
+
             newBoard[newY][newX] = myColour + myType;
             newBoard[startY][startX] = "";
             moves.push(
-            {
-                moveBoard: newBoard,
-                from: {
-                    x: startX,
-                    y: startY
-                },
-                to: {
-                    x: newX,
-                    y: newY
-                },
-                value: value
-            });
-        } catch(e) {
-            if(e == "Invalid move.") {
-                if(debug) console.log(e); 
+                {
+                    moveBoard: newBoard,
+                    from: {
+                        x: startX,
+                        y: startY
+                    },
+                    to: {
+                        x: newX,
+                        y: newY
+                    },
+                    value: value
+                });
+        } catch (e) {
+            if (e == "Invalid move.") {
+                if (debug) console.log(e);
                 break;
             }
         }
         spaces--;
-        if(debug) console.log("=======END MOVE=========");
+        if (debug) console.log("=======END MOVE=========");
     }
     if(debug) console.log(moves);
     return moves;
 }
-
-// function findMovesDirectional(board, x, y, direction, cnt = 10, isPawn=false) {
-//     console.log("Finding all moves:", direction);
-
-//     moves = 
-//     [
-//         {
-//             from: {
-//                 x = 1, 
-//                 y = 2
-//             },
-//             to: {
-//                 x = 1, 
-//                 y = 2
-//             },
-//             gain: 0 
-//         }
-//     ]
-
-//     moves = []
-
-//     if(direction == "UP") {
-//         _x, _y = x, y
-
-//         console.log("AT:", _x, ",", m_y);
-
-//         // Handle pawn promotion
-//         if(_y == 8 || _y == 0) {
-//             if(isPawn) {
-//                 console.log("CAN PRMOTE");
-//                 return;
-//             }
-//         }
-
-//         // Handle pawns moving 1/2 spaces
-//         if(_y == 1 || _y == 6) {
-//             console.log("Can move 2 spaces");
-//         }
-
-//         return moves;
-//     }
-// }
 
 function findMovesFor(board, x, y, debug=false) {
     let moves = [];
@@ -298,16 +258,23 @@ function processBoard(board) {
                 console.log()
                 if(piece.colour == whosTurn) {
                     moves = findMovesFor(board, x, y);
-                    console.log("FOUND SHIT FAM:", moves);
+                    //console.log("FOUND SHIT FAM:", moves);
                     allMoves.concat(moves);
                 }
             }
 		}
 	}
-    console.log("Moves.", moves);
+    //console.log("Moves.", moves);
     if(moves.length == 0) {
         console.log("Stalemate.")
     }
+    
+    moves.forEach(move => {
+        console.log(move.from, move.to, move.value);
+    });
+
+    var fs = require("fs");
+    fs.writeFileSync("./dat.json", JSON.stringify(moves, null, 4));
 }
 
 processBoard(board);
