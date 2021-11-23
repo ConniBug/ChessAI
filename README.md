@@ -1,5 +1,7 @@
 # Chess AI
 
+Node js isnt good for this kinda stuff, or im just bad.
+
 ## Getting started
 
 Start using Node
